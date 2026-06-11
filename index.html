@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f6b54">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="제안서 듣기">
 <title>제안서 작성의 이해 — 한·영 듣기 플레이어</title>
 <style>
   :root{
@@ -60,7 +66,7 @@
 <body>
 <header>
   <div class="title">제안서 작성의 이해 · 한국어/English 학습 플레이어 (260611)</div>
-  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다</div>
+  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다 · v3</div>
   <div class="controls">
     <button class="primary" id="playBtn">▶ 재생</button>
     <button id="restartBtn">처음부터</button>
@@ -88,7 +94,7 @@
     PC는 Edge 브라우저에서 열면 가장 자연스러운 음성을 쓸 수 있습니다. 재생 중에는 화면이 자동으로 꺼지지 않으며, 끊기면 현재 문장부터 자동 재개됩니다.
   </div>
   <div id="doc"></div>
-  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영</div>
+  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영 · 앱 버전 v3 (절전대응)</div>
 </main>
 <script>
 // ─────────────────────────────────────────────────────────────
@@ -405,6 +411,8 @@ function stopAll(msg){
 playBtn.onclick=()=>{ playing ? stopAll() : startFrom(idx); };
 document.getElementById('restartBtn').onclick=()=>startFrom(0);
 [modeSel,rateSel,vEnSel,vKoSel].forEach(s=>s.onchange=()=>{ if(playing){ startFrom(idx); } });
+
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('./sw.js').then(r=>{try{r.update();}catch(e){}}).catch(()=>{}); }
 window.addEventListener('beforeunload',()=>{ session++; synth.cancel(); });
 </script>
 </body>
