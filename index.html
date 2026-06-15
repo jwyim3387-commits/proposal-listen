@@ -61,12 +61,23 @@
   .en{font-size:14.5px; color:var(--en); margin-top:3px; line-height:1.6;}
   .pair .lang-now{text-decoration:underline; text-decoration-color:#e0a800; text-decoration-thickness:2px; text-underline-offset:4px;}
   .foot{font-size:12px; color:var(--muted); margin-top:30px;}
+  .pair{position:relative; padding-right:38px;}
+  .star{position:absolute; top:6px; right:8px; font-size:18px; line-height:1;
+        color:#d8d4c8; cursor:pointer; user-select:none; padding:2px 4px;}
+  .star.on{color:#e0a800;}
+  .pair.starred{background:#fffaf0;}
+  .pair.starred.now{background:var(--hl);}
+  .repeat-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;}
+  .repeat-row .seg{font-size:12px; color:var(--muted); margin-left:4px;}
+  .chip{border:1px solid var(--line); background:var(--card); border-radius:14px;
+        padding:5px 12px; font-size:13px; font-weight:600; cursor:pointer; color:var(--ink);}
+  .chip.active{background:var(--accent); border-color:var(--accent); color:#fff;}
 </style>
 </head>
 <body>
 <header>
   <div class="title">제안서 작성의 이해 · 한국어/English 학습 플레이어 (260611)</div>
-  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다 · v5</div>
+  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다 · v6</div>
   <div class="controls">
     <button class="primary" id="playBtn">▶ 재생</button>
     <button id="restartBtn">처음부터</button>
@@ -85,16 +96,21 @@
     <select id="voiceEn"></select>
     <select id="voiceKo"></select>
   </div>
+  <div class="repeat-row">
+    <span class="chip" id="repeatStar">★ 즐겨찾기만 반복</span>
+    <span class="chip" id="repeatRange">⟳ 구간반복: 꺼짐</span>
+    <span class="seg" id="rangeInfo"></span>
+  </div>
   <div class="bar"><div id="prog"></div></div>
 </header>
 <main>
   <div class="hint">
     한글 문장 바로 아래 영문이 함께 표시됩니다. 읽기 모드에서 <b>영어만</b>,
     <b>한국어 → 영어</b>, <b>영어 → 한국어</b>(한 문장씩 번갈아), <b>한국어만</b>을 선택할 수 있습니다.
-    PC는 Edge 브라우저에서 열면 가장 자연스러운 음성을 쓸 수 있습니다. 재생 중에는 화면이 자동으로 꺼지지 않으며, 끊기면 현재 문장부터 자동 재개됩니다.
+    각 문장 오른쪽 <b>★</b>를 눌러 즐겨찾기에 담고 <b>★ 즐겨찾기만 반복</b>으로 어려운 문장만 모아 들을 수 있습니다. 문장을 길게 누르면(또는 ⟳ 구간반복) 시작·끝을 정해 그 구간만 무한 반복합니다. 재생 중에는 화면이 꺼지지 않지만, 배터리를 위해 화면 밝기는 최소로 낮춰 두세요.
   </div>
   <div id="doc"></div>
-  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영 · 앱 버전 v5</div>
+  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영 · 앱 버전 v6 (반복·간격)</div>
 </main>
 <script>
 // ─────────────────────────────────────────────────────────────
@@ -256,9 +272,20 @@ pairs.forEach((b,i)=>{
     const d=document.createElement('div'); d.className='pair';
     const k=document.createElement('div'); k.className='ko'; k.textContent=b.ko;
     const e=document.createElement('div'); e.className='en'; e.textContent=b.en;
-    d.appendChild(k); d.appendChild(e);
-    d.onclick=()=>startFrom(i);
-    docEl.appendChild(d); els.push({d,k,e});
+    const st=document.createElement('span'); st.className='star'; st.textContent='☆';
+    st.onclick=(ev)=>{ ev.stopPropagation(); toggleStar(i); };
+    d.appendChild(st); d.appendChild(k); d.appendChild(e);
+    // 짧게 누르면 그 문장부터 재생, 길게 누르면 구간 지정
+    let pressTimer=null, longPressed=false;
+    const startPress=()=>{ longPressed=false; pressTimer=setTimeout(()=>{ longPressed=true; setRangePoint(i); },550); };
+    const endPress=()=>{ if(pressTimer) clearTimeout(pressTimer); };
+    d.onclick=()=>{ if(longPressed){ longPressed=false; return; } startFrom(i); };
+    d.addEventListener('touchstart',startPress,{passive:true});
+    d.addEventListener('touchend',endPress);
+    d.addEventListener('mousedown',startPress);
+    d.addEventListener('mouseup',endPress);
+    d.addEventListener('mouseleave',endPress);
+    docEl.appendChild(d); els.push({d,k,e,st});
   }
 });
 
@@ -289,6 +316,80 @@ function loadVoices(){
 }
 loadVoices();
 if(speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=loadVoices;
+
+
+// ── 즐겨찾기(★) · 구간반복 ──
+const STAR_KEY='proposal_listen_stars_v1';
+let stars=new Set();
+try{ const sv=localStorage.getItem(STAR_KEY); if(sv) stars=new Set(JSON.parse(sv)); }catch(e){}
+function saveStars(){ try{ localStorage.setItem(STAR_KEY, JSON.stringify([...stars])); }catch(e){} }
+function applyStarUI(i){
+  const el=els[i]; if(!el||!el.st) return;
+  const on=stars.has(i);
+  el.st.textContent=on?'★':'☆';
+  el.st.classList.toggle('on',on);
+  el.d.classList.toggle('starred',on);
+}
+function toggleStar(i){ if(stars.has(i)) stars.delete(i); else stars.add(i); saveStars(); applyStarUI(i); }
+pairs.forEach((p,i)=>{ if(p.t==='s') applyStarUI(i); });
+
+let repeatStarOnly=false;     // ★ 즐겨찾기만 반복
+let rangeStart=null, rangeEnd=null;  // 구간반복 (인덱스)
+const repeatStarBtn=document.getElementById('repeatStar');
+const repeatRangeBtn=document.getElementById('repeatRange');
+const rangeInfo=document.getElementById('rangeInfo');
+
+function shortText(i){ const t=pairs[i]?pairs[i].ko:''; return t.length>12?t.slice(0,12)+'…':t; }
+function updateRangeUI(){
+  if(rangeStart!==null && rangeEnd!==null){
+    repeatRangeBtn.textContent='⟳ 구간반복: 켜짐';
+    repeatRangeBtn.classList.add('active');
+    rangeInfo.textContent='['+shortText(rangeStart)+' ~ '+shortText(rangeEnd)+'] 반복 (탭하면 해제)';
+  }else if(rangeStart!==null){
+    repeatRangeBtn.textContent='⟳ 끝 문장 선택';
+    repeatRangeBtn.classList.add('active');
+    rangeInfo.textContent='시작: '+shortText(rangeStart)+' · 끝 문장을 길게 누르세요';
+  }else{
+    repeatRangeBtn.textContent='⟳ 구간반복: 꺼짐';
+    repeatRangeBtn.classList.remove('active');
+    rangeInfo.textContent='';
+  }
+}
+// 길게 누른 문장으로 구간 시작/끝 지정
+function setRangePoint(i){
+  if(pairs[i].t!=='s') return;
+  if(rangeStart===null){ rangeStart=i; rangeEnd=null; }
+  else if(rangeEnd===null){
+    if(i<rangeStart){ rangeEnd=rangeStart; rangeStart=i; } else { rangeEnd=i; }
+  }else{ rangeStart=i; rangeEnd=null; }   // 이미 지정돼 있으면 새로 시작
+  updateRangeUI();
+  els.forEach((e,j)=>{ if(e) e.d.style.outline=(rangeStart!==null&&rangeEnd!==null&&j>=rangeStart&&j<=rangeEnd)?'2px solid #e0a800':''; });
+  if(rangeStart!==null && rangeEnd!==null && playing) startFrom(rangeStart);
+}
+repeatRangeBtn.onclick=()=>{ rangeStart=null; rangeEnd=null; updateRangeUI();
+  els.forEach(e=>{ if(e) e.d.style.outline=''; }); };
+repeatStarBtn.onclick=()=>{
+  if(!repeatStarOnly && stars.size===0){ status.textContent='먼저 ★로 문장을 담아주세요'; return; }
+  repeatStarOnly=!repeatStarOnly;
+  repeatStarBtn.classList.toggle('active',repeatStarOnly);
+  repeatStarBtn.textContent=repeatStarOnly?'★ 즐겨찾기 반복 끄기':'★ 즐겨찾기만 반복';
+  if(playing) startFrom(idx);
+};
+
+// 다음 재생할 인덱스 결정 (반복 모드 반영)
+function nextIndex(cur){
+  // 1) 구간반복 우선
+  if(rangeStart!==null && rangeEnd!==null){
+    return cur>=rangeEnd ? rangeStart : cur+1;
+  }
+  // 2) 즐겨찾기만 반복
+  if(repeatStarOnly && stars.size>0){
+    const list=[...stars].sort((a,b)=>a-b);
+    const nx=list.find(j=>j>cur);
+    return nx!==undefined ? nx : list[0];
+  }
+  return cur+1;
+}
 
 function mark(i, lang){
   document.querySelectorAll('.pair.now').forEach(e=>e.classList.remove('now'));
@@ -344,10 +445,22 @@ function speakOne(i, lang, text, next){
 
 function speakNext(){
   if(!playing) return;
+  if(repeatStarOnly && stars.size>0 && !stars.has(idx)){
+    const list=[...stars].sort((a,b)=>a-b);
+    idx = list.find(j=>j>=idx) ?? list[0];
+  }
   while(idx<pairs.length && pairs[idx].t==='h') idx++;
   if(idx>=pairs.length){ stopAll('낭독 완료'); prog.style.width='100%'; return; }
   const b=pairs[idx], m=modeSel.value, i=idx;
-  const advance=()=>{ idx=i+1; speakNext(); };
+  const advance=()=>{
+    const nx=nextIndex(i);
+    // 다음 문장으로 가는 길에 장(제목)을 넘는다면 1.5초 쉼
+    let crossHeader=false;
+    if(nx>i){ for(let j=i+1;j<=nx;j++){ if(pairs[j]&&pairs[j].t==='h'){ crossHeader=true; break; } } }
+    idx=nx;
+    if(crossHeader && playing){ status.textContent='다음 장…'; setTimeout(()=>{ if(playing){ status.textContent='재생 중'; speakNext(); } },1500); }
+    else speakNext();
+  };
   if(m==='en'){
     speakOne(i,'en',toSpeechEn(b.en),advance);
   }else if(m==='ko'){
