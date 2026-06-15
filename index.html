@@ -72,12 +72,20 @@
   .chip{border:1px solid var(--line); background:var(--card); border-radius:14px;
         padding:5px 12px; font-size:13px; font-weight:600; cursor:pointer; color:var(--ink);}
   .chip.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .chap-wrap{position:relative;}
+  .chap-panel{position:absolute; top:36px; left:0; z-index:20; background:var(--card);
+    border:1px solid var(--line); border-radius:10px; padding:6px; max-height:50vh;
+    overflow:auto; box-shadow:0 8px 24px rgba(0,0,0,.12); min-width:240px; display:none;}
+  .chap-panel.open{display:block;}
+  .chap-item{padding:8px 10px; border-radius:7px; font-size:14px; cursor:pointer; color:var(--ink);}
+  .chap-item:hover{background:#f0eee7;}
+  .chap-item .en-s{display:block; font-size:11.5px; color:var(--muted); margin-top:1px;}
 </style>
 </head>
 <body>
 <header>
   <div class="title">제안서 작성의 이해 · 한국어/English 학습 플레이어 (260611)</div>
-  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다 · v6</div>
+  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다 · v7</div>
   <div class="controls">
     <button class="primary" id="playBtn">▶ 재생</button>
     <button id="restartBtn">처음부터</button>
@@ -97,6 +105,7 @@
     <select id="voiceKo"></select>
   </div>
   <div class="repeat-row">
+    <span class="chap-wrap"><span class="chip" id="chapBtn">☰ 장 선택</span><span class="chap-panel" id="chapPanel"></span></span>
     <span class="chip" id="repeatStar">★ 즐겨찾기만 반복</span>
     <span class="chip" id="repeatRange">⟳ 구간반복: 꺼짐</span>
     <span class="seg" id="rangeInfo"></span>
@@ -107,10 +116,10 @@
   <div class="hint">
     한글 문장 바로 아래 영문이 함께 표시됩니다. 읽기 모드에서 <b>영어만</b>,
     <b>한국어 → 영어</b>, <b>영어 → 한국어</b>(한 문장씩 번갈아), <b>한국어만</b>을 선택할 수 있습니다.
-    각 문장 오른쪽 <b>★</b>를 눌러 즐겨찾기에 담고 <b>★ 즐겨찾기만 반복</b>으로 어려운 문장만 모아 들을 수 있습니다. 문장을 길게 누르면(또는 ⟳ 구간반복) 시작·끝을 정해 그 구간만 무한 반복합니다. 재생 중에는 화면이 꺼지지 않지만, 배터리를 위해 화면 밝기는 최소로 낮춰 두세요.
+    <b>☰ 장 선택</b>으로 원하는 장으로 바로 이동할 수 있습니다. 각 문장 오른쪽 <b>★</b>를 눌러 즐겨찾기에 담고 <b>★ 즐겨찾기만 반복</b>으로 어려운 문장만 모아 들을 수 있습니다. 문장을 길게 누르면(또는 ⟳ 구간반복) 시작·끝을 정해 그 구간만 무한 반복합니다. 재생 중에는 화면이 꺼지지 않지만, 배터리를 위해 화면 밝기는 최소로 낮춰 두세요.
   </div>
   <div id="doc"></div>
-  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영 · 앱 버전 v6 (반복·간격)</div>
+  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영 · 앱 버전 v7 (장 선택)</div>
 </main>
 <script>
 // ─────────────────────────────────────────────────────────────
@@ -375,6 +384,31 @@ repeatStarBtn.onclick=()=>{
   repeatStarBtn.textContent=repeatStarOnly?'★ 즐겨찾기 반복 끄기':'★ 즐겨찾기만 반복';
   if(playing) startFrom(idx);
 };
+
+
+// ── 장 선택 ──
+const chapBtn=document.getElementById('chapBtn');
+const chapPanel=document.getElementById('chapPanel');
+(function buildChapters(){
+  pairs.forEach((p,i)=>{
+    if(p.t!=='h') return;
+    const it=document.createElement('div'); it.className='chap-item';
+    it.textContent=p.ko;
+    const en=document.createElement('span'); en.className='en-s'; en.textContent=p.en;
+    it.appendChild(en);
+    it.onclick=()=>{
+      chapPanel.classList.remove('open');
+      // 제목 다음의 첫 문장부터 재생
+      let j=i+1; while(j<pairs.length && pairs[j].t==='h') j++;
+      startFrom(j<pairs.length? j : i);
+    };
+    chapPanel.appendChild(it);
+  });
+})();
+chapBtn.onclick=(e)=>{ e.stopPropagation(); chapPanel.classList.toggle('open'); };
+document.addEventListener('click',(e)=>{
+  if(!chapPanel.contains(e.target) && e.target!==chapBtn) chapPanel.classList.remove('open');
+});
 
 // 다음 재생할 인덱스 결정 (반복 모드 반영)
 function nextIndex(cur){
