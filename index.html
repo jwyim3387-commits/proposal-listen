@@ -85,7 +85,7 @@
 <body>
 <header>
   <div class="title">제안서 작성의 이해 · 한국어/English 학습 플레이어 (260611)</div>
-  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다 · v10</div>
+  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다 · v16</div>
   <div class="controls">
     <button class="primary" id="playBtn">▶ 재생</button>
     <button id="restartBtn">처음부터</button>
@@ -119,7 +119,7 @@
     <b>☰ 장 선택</b>으로 원하는 장으로 바로 이동할 수 있습니다. 각 문장 오른쪽 <b>★</b>를 눌러 즐겨찾기에 담고 <b>★ 즐겨찾기만 반복</b>으로 어려운 문장만 모아 들을 수 있습니다. 문장을 길게 누르면(또는 ⟳ 구간반복) 시작·끝을 정해 그 구간만 무한 반복합니다. 재생 중에는 화면이 꺼지지 않지만, 배터리를 위해 화면 밝기는 최소로 낮춰 두세요.
   </div>
   <div id="doc"></div>
-  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영 · 앱 버전 v10</div>
+  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영 · 앱 버전 v16</div>
 </main>
 <script>
 // ─────────────────────────────────────────────────────────────
@@ -171,17 +171,13 @@ const pairs = [
 {"t": "s", "ko": "셋째는 조직과 프로세스입니다.", "en": "Third is organization and process."},
 {"t": "s", "ko": "목표시스템을 만들어낼 수 있는 조직, 인력, 표준 프로세스가 갖추어져 있는지를 보여주는 간접 역량입니다.", "en": "This is indirect capability that shows whether we have the organization, people, and standard process to create the target system."},
 {"t": "h", "ko": "역량과 구축의 차이", "en": "Competency vs. Implementation"},
-{"t": "s", "ko": "역량은 과거에 이미 검증된 정적인 능력입니다.", "en": "Competency is a static capability that has already been proven in the past."},
-{"t": "s", "ko": "반면 시스템구축은 앞으로 목표시스템을 어떻게 만들 것인지 보여주는 미래의 동적인 계획입니다.", "en": "System implementation, on the other hand, is a dynamic plan for the future that shows how we will build the target system."},
-{"t": "s", "ko": "따라서 역량 장에서는 “우리가 이미 갖고 있는 것”을 증명하고, 시스템구축 장에서는 “그 역량을 가지고 앞으로 어떻게 AS-IS를 TO-BE로 바꿀 것인가”를 설명해야 합니다.", "en": "Therefore, the competency section proves what we already have, while the system implementation section explains how we will use that competency to move from AS-IS to TO-BE."},
+{"t": "s", "ko": "역량 장에서는 “과거에 우리가 이미 갖고 있는 것”을 증명하고, 시스템구축 장에서는 “그 역량을 가지고 미래에 어떻게 AS-IS를 TO-BE로 바꿀 것인가”를 설명해야 합니다.", "en": "The competency section proves what we have already had in the past, while the system implementation section explains how we will use that competency to change AS-IS into TO-BE in the future."},
 {"t": "h", "ko": "3. 시스템구축", "en": "3. System Implementation"},
 {"t": "s", "ko": "세 번째는 시스템구축입니다.", "en": "The third part is system implementation."},
 {"t": "s", "ko": "목표시스템은 단순히 사람, 장소, 일정만 정한다고 만들어지는 것이 아닙니다.", "en": "A target system cannot be built simply by deciding people, location, and schedule."},
 {"t": "s", "ko": "현재 상태인 AS-IS에서 목표 상태인 TO-BE로 전환하는 마이그레이션 과정이 필요합니다.", "en": "It requires a migration process from the current AS-IS state to the target TO-BE state."},
-{"t": "s", "ko": "이 마이그레이션은 크게 인프라, 소프트웨어/정보, 업무체계의 3단계로 볼 수 있습니다.", "en": "This migration can be divided into three stages: infrastructure, software and information, and business process."},
+{"t": "s", "ko": "이 마이그레이션은 크게 인프라, 소프트웨어/정보, 업무체계의 3개 영역과 현재 상태인 Baseline에서 Phase 1과 Phase 2를 거쳐 목표 상태인 Target Line으로 나아가는 단계적 전환 구조로 설명해야 합니다.", "en": "This migration should be explained in terms of three areas — infrastructure, software and information, and business — together with a phased transition structure that moves from the current Baseline through Phase 1 and Phase 2 to the target Target Line."},
 {"t": "h", "ko": "Baseline → Phase → Target Line", "en": "Baseline → Phase → Target Line"},
-{"t": "s", "ko": "시스템구축은 인프라·정보·업무를 단순히 나열하는 3단계가 아니라, 현재 상태인 Baseline에서 Phase 1과 Phase 2를 거쳐 목표 상태인 Target Line으로 나아가는 단계적 전환 구조로 설명해야 합니다.", "en": "System implementation should not be described as three flat stages of infrastructure, information, and business; it must be explained as a phased transition structure that moves from the current Baseline through Phase 1 and Phase 2 to the target Target Line."},
-{"t": "s", "ko": "인프라, 정보, 업무는 그 자체가 단계가 아니라, 각 Phase 안에서 전환되는 세 가지 영역입니다.", "en": "Infrastructure, information, and business are not stages in themselves; they are three areas that are transformed within each Phase."},
 {"t": "s", "ko": "Phase 1은 인프라 영역에서 정보 영역으로의 전환이고, Phase 2는 정보 영역에서 업무 영역으로의 전환입니다.", "en": "Phase 1 is the transition from the infrastructure area to the information area, and Phase 2 is the transition from the information area to the business area."},
 {"t": "s", "ko": "인프라 영역에서는 서버, 네트워크, 보안, 현장장비 등 기술 기반을 구축합니다.", "en": "In the infrastructure area, technical foundations such as servers, networks, security, and field devices are built."},
 {"t": "s", "ko": "정보 영역에서는 데이터베이스, 인터페이스, 애플리케이션, 솔루션을 구축하고 데이터를 정비합니다.", "en": "In the information area, databases, interfaces, applications, and solutions are established and data is cleansed."},
@@ -214,23 +210,16 @@ const pairs = [
 {"t": "s", "ko": "즉, 사업수행계획은 일정표만 만드는 것이 아니라 실제 투입 인력, 역할, 조직, 교육계획, 산출물을 세팅하는 단계입니다.", "en": "In other words, the execution plan is not just a schedule table; it is the stage that sets up actual assigned personnel, roles, organization, training plans, and deliverables."},
 {"t": "s", "ko": "특히 IT서비스 사업에서는 누가 실제로 투입될 수 있는지, 부족한 역량은 어떻게 교육으로 보완할지까지 보여주는 것이 중요합니다.", "en": "In IT service projects especially, it is important to show who can actually be assigned and how any missing capability will be supplemented through training."},
 {"t": "h", "ko": "6. Change Management", "en": "6. Change Management"},
-{"t": "s", "ko": "변화관리는 단순한 사용자 교육이 아니라, 고객의 Baseline Mindset을 Target Mindset으로 바꾸는 고객 마인드셋 전환계획입니다.", "en": "Change Management is not simple user training; it is a customer mindset transition plan that changes the customer’s Baseline Mindset into the Target Mindset."},
-{"t": "s", "ko": "목표시스템이 구축되어도 일하는 방식이 바뀌지 않으면 다시 예전 방식으로 돌아가기 때문입니다.", "en": "This is because even if the target system is built, if the way of working does not change, people will return to the old way."},
+{"t": "s", "ko": "목표시스템이 구축되어도 일하는 방식이 바뀌지 않으면 다시 예전 방식으로 돌아갑니다.", "en": "Even if the target system is built, if the way of working does not change, people return to the old way."},
 {"t": "s", "ko": "그래서 변화관리는 운영자, 관리자, 의사결정자가 목표시스템을 이해하고, 화면과 데이타를 다루며, 업무판단기준을 데이타 기반으로 결정하도록 지원합니다.", "en": "Therefore, Change Management helps operators, managers, and decision makers understand the target system, use the screens and data, and make work judgments based on data."},
 {"t": "h", "ko": "SKA와 마인드셋 성장", "en": "SKA and Mindset Growth"},
-{"t": "s", "ko": "변화관리는 SKA(기술·지식·태도)가 쌓여 마인드셋과 성장까지 이어지도록 설계해야 합니다.", "en": "Change Management should be designed so that SKA — Skill, Knowledge, and Attitude — accumulates and leads to Mindset and Growth."},
+{"t": "s", "ko": "변화관리는 기술·지식·태도가 쌓여 마인드셋과 성장까지 이어지도록 설계해야 합니다.", "en": "Change Management should be designed so that SKA — Skill, Knowledge, and Attitude — accumulates and leads to Mindset and Growth."},
 {"t": "s", "ko": "기술은 목표시스템의 화면과 데이타를 다루는 능력입니다.", "en": "Skill is the ability to use the screens and data of the target system."},
 {"t": "s", "ko": "기술이 반복되면 지식, 즉 목표시스템과 업무원리에 대한 이해로 일반화됩니다.", "en": "When Skill is repeated, it generalizes into Knowledge, which means understanding the target system and the principles of work."},
 {"t": "s", "ko": "그다음 태도, 즉 데이타를 보고 판단하려는 태도가 형성됩니다.", "en": "Then Attitude is formed, which means the willingness to judge based on data."},
 {"t": "s", "ko": "이 과정이 쌓이면 운영자는 목표시스템을 참고용이 아닌 업무판단기준으로 받아들이는 마인드셋을 갖게 되고, 최종적으로 스스로 문제를 찾고 해결하는 성장 단계로 발전합니다.", "en": "As this process accumulates, the operator develops the Mindset of accepting the target system not as a reference tool but as the standard for work judgment, and finally advances to the Growth stage of finding and solving problems on their own."},
-{"t": "h", "ko": "마인드셋 전환 지점", "en": "Mindset Transition Points"},
-{"t": "s", "ko": "인프라, 정보, 업무 영역이 전환되는 지점마다 고객의 마인드셋도 함께 전환되어야 합니다.", "en": "At each transition point of the infrastructure, information, and business areas, the customer’s mindset must also change together."},
 {"t": "h", "ko": "변화관리 설계 순서", "en": "The Design Sequence of Change Management"},
-{"t": "s", "ko": "따라서 변화관리는 단순 교육이 아니라, Capability Definition(목표역량 정의) → Capability Assessment(현재역량 진단) → Gap 분석(차이 확인) → Capability Planning(역량 향상 계획)의 순서로 Baseline Mindset을 Target Mindset으로 전환하는 과정입니다.", "en": "Therefore, Change Management is not simple training; it is a process of transforming the Baseline Mindset into the Target Mindset in the order of Capability Definition, Capability Assessment, Gap analysis, and Capability Planning."},
-{"t": "s", "ko": "먼저 목표시스템을 원활히 운영하는 데 필요한 목표역량 수준을 정의하고, 운영자의 SKA 수준을 평가하여 현재역량을 진단합니다.", "en": "First, we define the target capability level required to operate the target system smoothly, and assess the operators’ SKA levels to diagnose the current capability."},
-{"t": "s", "ko": "이후 목표역량과 현재역량의 차이를 확인하고, 인프라, 정보, 업무 전환단계별로 필요한 교육과 현장적용을 수행합니다.", "en": "Then we identify the gap between the target capability and the current capability, and carry out the necessary training and on-site application at each transition stage of infrastructure, information, and business."},
-{"t": "s", "ko": "예를 들어 목표운영수준을 70점으로 정했는데 기술 30점, 지식 20점, 태도 10점이라면 단계별 교육과 현장적용을 통해 목표수준까지 끌어올려야 합니다.", "en": "For example, if the target operation level is set at 70 points but Skill is 30, Knowledge is 20, and Attitude is 10, they must be raised to the target level through step-by-step training and on-site application."},
-{"t": "s", "ko": "Capability Planning은 현재의 Baseline Capability를 Target Capability로 끌어올리기 위한 전체 역량 향상 계획으로, 단계별 교육과 현장적용을 포함합니다.", "en": "Capability Planning is the overall capability improvement plan for raising the current Baseline Capability to the Target Capability, and it includes step-by-step training and on-site application."},
+{"t": "s", "ko": "따라서 변화관리는 단순 교육이 아니라, Capability Definition(목표시스템을 원활히 운영하는데 필요한 목표역량 정의) → Capability Assessment(운영자의 현재 기술·지식·태도 역량 진단) → Gap 분석(목표역량과 현재역량 차이 확인) → Capability Planning(단계별교육과 현장적용위한 역량 향상 계획)의 순서로 Baseline Mindset을 Target Mindset으로 전환하는 과정입니다.", "en": "Therefore, Change Management is not simple training; it is a process of transforming the Baseline Mindset into the Target Mindset in the order of Capability Definition (defining the target capability needed to operate the target system smoothly), Capability Assessment (diagnosing the operators’ current SKA capability), Gap analysis (identifying the gap between the target and current capability), and Capability Planning (the capability improvement plan for step-by-step training and on-site application)."},
 {"t": "h", "ko": "7. Operation", "en": "7. Operation"},
 {"t": "s", "ko": "운영관리는 단순한 유지보수나 백업·복구 계획이 아니라, 목표시스템이 실제로 쓰이고 있는지, 제대로 작동하는지, 기대효과가 실제로 나타나는지를 검증하는 단계입니다.", "en": "Operation is not just a maintenance, backup, or recovery plan; it is the stage that verifies whether the target system is actually being used, whether it works properly, and whether the expected benefits are actually appearing."},
 {"t": "h", "ko": "서비스 모니터링과 4가지 선행조건", "en": "Service Monitoring and the Four Preconditions"},
