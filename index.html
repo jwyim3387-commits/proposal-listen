@@ -85,7 +85,7 @@
 <body>
 <header>
   <div class="title">제안서 작성의 이해 · 한국어/English 학습 플레이어 (260611)</div>
-  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다 · v19</div>
+  <div class="sub" id="status">문장을 누르면 그 문장부터 읽어줍니다 · v20</div>
   <div class="controls">
     <button class="primary" id="playBtn">▶ 재생</button>
     <button id="restartBtn">처음부터</button>
@@ -119,7 +119,7 @@
     <b>☰ 장 선택</b>으로 원하는 장으로 바로 이동할 수 있습니다. 각 문장 오른쪽 <b>★</b>를 눌러 즐겨찾기에 담고 <b>★ 즐겨찾기만 반복</b>으로 어려운 문장만 모아 들을 수 있습니다. <b>⟳ 구간반복</b>을 누른 뒤 시작 문장과 끝 문장을 차례로 탭하면 그 구간만 무한 반복합니다. 재생 중에는 화면이 꺼지지 않지만, 배터리를 위해 화면 밝기는 최소로 낮춰 두세요.
   </div>
   <div id="doc"></div>
-  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영 · 앱 버전 v19</div>
+  <div class="foot">제안서 작성의 이해 | 10분 암기용 수정본 | 260609 보완 + 260611 추가 보완 반영 · 앱 버전 v20 (끊김 방지)</div>
 </main>
 <script>
 // ─────────────────────────────────────────────────────────────
@@ -464,11 +464,17 @@ document.addEventListener('visibilitychange',()=>{
     if(!synth.speaking && !synth.pending) startFrom(idx);  // 화면 복귀 시 멈춰 있으면 현재 문장부터 재개
   }
 });
+// 크롬은 ~15초 연속 발화 후 엔진이 스스로 멈추는 버그가 있어, 말하는 동안 짧게 pause→resume로 깨워준다
 setInterval(()=>{
   if(!playing) return;
-  try{ synth.resume(); }catch(e){}
-  if(!synth.speaking && !synth.pending && Date.now()-lastBeat>8000) startFrom(idx);  // 8초 이상 무음이면 재개
-},4000);
+  if(synth.speaking){ try{ synth.pause(); synth.resume(); }catch(e){} }
+},10000);
+// 발화가 끊겨 일정 시간 무음이면 현재 문장부터 자동 재개 (감지 주기·시간 단축)
+setInterval(()=>{
+  if(!playing) return;
+  try{ if(synth.paused) synth.resume(); }catch(e){}
+  if(!synth.speaking && !synth.pending && Date.now()-lastBeat>3000) startFrom(idx);
+},1500);
 
 // 한 문장을 말하고, 끝나면 next() 호출. 세션이 바뀌면(클릭/모드변경/정지) 콜백 무효화.
 function speakOne(i, lang, text, next){
